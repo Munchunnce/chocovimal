@@ -47,16 +47,16 @@ export async function POST(request: Request){
 
     //  transaction
     let transactionError: string = "";
-    let finalOrder: { id: number; price: number } | null = null;
+    let finalOrder: { id: number; price: number } | undefined;
     try {
-        finalOrder = await db.transaction(async (tx): Promise<{ id: number; price: number } | null> => {
+        finalOrder = await db.transaction(async (tx) => {
             //create order
             const order = await tx
                 .insert(orders)
                 .values({
                     ...validatedData,
-                    // @ts-expect-error: session.token.id is assumed to exist but is not typed
-                    userId: session.token.id,
+                    // @ts-expect-error: this
+                    userId: session.token?.id,
                     price: foundProducts[0].price * validatedData.qty,
                     //todo: move all statuses to enum or const
                     status: 'received',
@@ -80,7 +80,7 @@ export async function POST(request: Request){
             if(availableStock.length < validatedData.qty) {
                 transactionError = `Stock is low, only ${availableStock.length} products available`;
                 tx.rollback();
-                return null;
+                return;
             }
 
             // Check delivery person availability
@@ -95,7 +95,7 @@ export async function POST(request: Request){
             if(!avalablePerson.length) {
                 transactionError = `Delivery persion is not available at the moment`;
                 tx.rollback();
-                return null;
+                return;
             }
 
             //stock is available and delivery person is available
@@ -120,17 +120,15 @@ export async function POST(request: Request){
 
             return order[0];
         });
-    } catch (err) {
+        console.log("finalOrder", finalOrder);
+    } catch {
         //log
         // in production -> be careful don't return internal errors to the client
-        return Response.json({ message: transactionError ? transactionError : 'Error while db transaction', err }, { status: 500 });
+        return Response.json({ message: transactionError ? transactionError : 'Error while db transaction' }, { status: 500 });
     }
 
 
     // payment logic goes here
-    if (finalOrder) {
-        console.log("Order created successfully:", finalOrder);
-    }
     // create invoice
     
 }

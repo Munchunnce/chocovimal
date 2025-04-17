@@ -11,16 +11,17 @@ export async function POST(request: Request){
 
     try {
         validatedData = await warehouseSchema.parse(requestData);
-    } catch (err) {
-        return Response.json({ message: err}, { status: 400 });
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Invalid input";
+        return Response.json({ message: errorMessage }, { status: 400 });
     }
 
     try {
         await db.insert(warehouses).values(validatedData);
 
         return Response.json({ message: 'OK'}, { status: 201});
-    } catch (err) {
-        return Response.json({ message: 'Failed to store the warehouse', err}, { status: 500});
+    } catch {
+        return Response.json({ message: 'Failed to store the warehouse'}, { status: 500});
     }
 };
 
@@ -28,7 +29,7 @@ export async function GET(){
     try {
         const allWarehouses = await db.select().from(warehouses);
         return Response.json(allWarehouses); 
-    } catch (err) {
-        return Response.json({ message: 'Failed to fetch all warehouse', err }, { status: 500});
+    } catch {
+        return Response.json({ message: 'Failed to fetch all warehouse' }, { status: 500});
     }
 };
