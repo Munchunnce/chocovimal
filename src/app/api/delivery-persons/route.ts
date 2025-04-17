@@ -18,7 +18,7 @@ export async function POST(request: Request){
         await db.insert(deliveryPersion).values(validatedData);
         return Response.json({ message: 'OK'}, {status: 201});
     } catch (err) {
-        return Response.json({ message: 'Failed to store the delivery person into the database'}, { status: 500});
+        return Response.json({ message: 'Failed to store the delivery person into the database', err}, { status: 500});
     }
 };
 
@@ -37,6 +37,6 @@ export async function GET(){
 
         return Response.json(allDeliveryPerson);
     } catch (err) {
-        return Response.json({ message: 'Failed to fetch delivery person'}, { status: 500})
+        return Response.json({ message: 'Failed to fetch delivery person', err}, { status: 500})
     }
 }

@@ -47,15 +47,15 @@ export async function POST(request: Request){
 
     //  transaction
     let transactionError: string = "";
-    let finalOrder: any = null;
+    let finalOrder: { id: number; price: number } | null = null;
     try {
-        finalOrder = await db.transaction(async (tx) => {
+        finalOrder = await db.transaction(async (tx): Promise<{ id: number; price: number } | null> => {
             //create order
             const order = await tx
                 .insert(orders)
                 .values({
                     ...validatedData,
-                    // @ts-ignore
+                    // @ts-expect-error: session.token.id is assumed to exist but is not typed
                     userId: session.token.id,
                     price: foundProducts[0].price * validatedData.qty,
                     //todo: move all statuses to enum or const
@@ -80,7 +80,7 @@ export async function POST(request: Request){
             if(availableStock.length < validatedData.qty) {
                 transactionError = `Stock is low, only ${availableStock.length} products available`;
                 tx.rollback();
-                return;
+                return null;
             }
 
             // Check delivery person availability
@@ -95,7 +95,7 @@ export async function POST(request: Request){
             if(!avalablePerson.length) {
                 transactionError = `Delivery persion is not available at the moment`;
                 tx.rollback();
-                return;
+                return null;
             }
 
             //stock is available and delivery person is available
@@ -123,11 +123,14 @@ export async function POST(request: Request){
     } catch (err) {
         //log
         // in production -> be careful don't return internal errors to the client
-        return Response.json({ message: transactionError ? transactionError : 'Error while db transaction' }, { status: 500 });
+        return Response.json({ message: transactionError ? transactionError : 'Error while db transaction', err }, { status: 500 });
     }
 
 
     // payment logic goes here
+    if (finalOrder) {
+        console.log("Order created successfully:", finalOrder);
+    }
     // create invoice
     
 }

@@ -20,7 +20,7 @@ export async function POST(request: Request){
 
         return Response.json({ message: 'OK'}, { status: 201});
     } catch (err) {
-        return Response.json({ message: 'Failed to store the warehouse'}, { status: 500});
+        return Response.json({ message: 'Failed to store the warehouse', err}, { status: 500});
     }
 };
 
@@ -29,6 +29,6 @@ export async function GET(){
         const allWarehouses = await db.select().from(warehouses);
         return Response.json(allWarehouses); 
     } catch (err) {
-        return Response.json({ message: 'Failed to fetch all warehouse' }, { status: 500});
+        return Response.json({ message: 'Failed to fetch all warehouse', err }, { status: 500});
     }
 };
