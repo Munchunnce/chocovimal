@@ -19,22 +19,19 @@
 // }
 
 
+// app/api/products/[id]/route.ts
+
 import { db } from "@/lib/db/db";
 import { products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
-import type { NextResponse } from "next/server";
-import type { NextRequest as AppRequest } from "next/server";
 
-
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(request: NextRequest, context: RouteContext) {
-  const id = context.params.id;
+// ✅ DO NOT define custom RouteContext type yourself
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
 
   try {
     const product = await db
@@ -45,7 +42,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     if (!product.length) {
       return new Response(JSON.stringify({ message: "Product not found." }), {
-        status: 400,
+        status: 404,
       });
     }
 
