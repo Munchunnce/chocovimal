@@ -11,7 +11,7 @@ export async function POST(request: Request){
 
     try {
         validatedData = await warehouseSchema.parse(requestData);
-    } catch (err: unknown) {
+    } catch (err: unknown) {    
         const errorMessage = err instanceof Error ? err.message : "Invalid input";
         return Response.json({ message: errorMessage }, { status: 400 });
     }
