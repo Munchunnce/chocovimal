@@ -23,25 +23,37 @@ import { db } from "@/lib/db/db";
 import { products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
+import type { NextResponse } from "next/server";
+import type { NextRequest as AppRequest } from "next/server";
 
-// ✅ use `context` with type { params: { id: string } }
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
-    const id = context.params.id;
 
-    try {
-        const product = await db
-            .select()
-            .from(products)
-            .where(eq(products.id, Number(id)))
-            .limit(1);
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
 
-        if (!product.length) {
-            return new Response(JSON.stringify({ message: "Product not found." }), { status: 400 });
-        }
+export async function GET(request: NextRequest, context: RouteContext) {
+  const id = context.params.id;
 
-        return new Response(JSON.stringify(product[0]), { status: 200 });
-    } catch {
-        return new Response(JSON.stringify({ message: "Failed to fetch a product" }), { status: 500 });
+  try {
+    const product = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, Number(id)))
+      .limit(1);
+
+    if (!product.length) {
+      return new Response(JSON.stringify({ message: "Product not found." }), {
+        status: 400,
+      });
     }
-}
 
+    return new Response(JSON.stringify(product[0]), { status: 200 });
+  } catch {
+    return new Response(
+      JSON.stringify({ message: "Failed to fetch a product" }),
+      { status: 500 }
+    );
+  }
+}
