@@ -22,13 +22,14 @@
 //     }
 // }
 
+
 import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
 
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   context: { params: { id: string } }
 ) {
   const { id } = context.params;
@@ -50,10 +51,13 @@ export async function GET(
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err) {
+  } catch (error) {
     return new Response(
-      JSON.stringify({ message: 'Failed to fetch product', error: err }),
-      { status: 500 }
+      JSON.stringify({ message: 'Error fetching product', error }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 }
