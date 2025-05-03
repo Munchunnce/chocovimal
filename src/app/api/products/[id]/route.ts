@@ -25,12 +25,13 @@
 import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { NextRequest } from 'next/server';
 
 export async function GET(
-  request: Request,
-  context: { params: { id: string } } // ✅ Correct context object
+  req: NextRequest,
+  context: { params: { id: string } }
 ) {
-  const id = context.params.id;
+  const { id } = context.params;
 
   try {
     const product = await db
@@ -40,11 +41,19 @@ export async function GET(
       .limit(1);
 
     if (!product.length) {
-      return Response.json({ message: 'Product not found.' }, { status: 400 });
+      return new Response(JSON.stringify({ message: 'Product not found.' }), {
+        status: 404,
+      });
     }
 
-    return Response.json(product[0]);
+    return new Response(JSON.stringify(product[0]), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
-    return Response.json({ message: 'Failed to fetch product', err }, { status: 500 });
+    return new Response(
+      JSON.stringify({ message: 'Failed to fetch product', error: err }),
+      { status: 500 }
+    );
   }
 }
