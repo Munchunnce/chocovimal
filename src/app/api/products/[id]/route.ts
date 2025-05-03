@@ -22,23 +22,28 @@
 //     }
 // }
 
-
 import { db } from '@/lib/db/db';
 import { products } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+export async function GET(request: NextRequest) {
+  // Extracting id from the URL path
+  const urlPath = request.nextUrl.pathname.split('/');
+  const id = urlPath[urlPath.length - 1];
+
+  if (!id) {
+    return new Response(
+      JSON.stringify({ message: 'Product ID is missing in the URL.' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 
   try {
     const product = await db
       .select()
       .from(products)
-      .where(eq(products.id, Number(id)))
+      .where(eq(products.id, Number(id))) // Ensuring id is converted to number
       .limit(1);
 
     if (!product.length) {
