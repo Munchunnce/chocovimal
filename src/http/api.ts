@@ -6,7 +6,7 @@ import { DeliveryPerson, Inventory, InventoryData, Product, Warehouse } from "@/
 export const getAllProducts = async () => {
     const response = await api.get<Product[]>('/products');
     return response.data;
-}
+};
 
 export const createProduct = async (data: FormData) => {
     const response = await api.post('/products', data, {
@@ -15,7 +15,7 @@ export const createProduct = async (data: FormData) => {
         }
     });
     return response.data;
-}
+};
 
 export const getAllWarehouses = async () => {
     const response = await api.get<Warehouse[]>('/warehouses');
@@ -40,7 +40,7 @@ export const createDeliveryPerson = async (data: DeliveryPerson) => {
 export const getAllInventories = async () => {
     const response = await api.get<Inventory[]>('/inventories');
     return response.data;
-}
+};
 
 export const createInventory = async (data: InventoryData) => {
     const response = await api.post('/inventories', data);
@@ -50,4 +50,4 @@ export const createInventory = async (data: InventoryData) => {
 export const getSingleProduct = async (id: string) => {
     const response = await api.get<Product>(`/products/${id}`);
     return response.data;
-}
+};
