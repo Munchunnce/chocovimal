@@ -12,4 +12,4 @@ export const useNewProduct = create<NewProductState>((set) => {
         onOpen: () => set({ isOpen: true }),
         onClsose: () => set({ isOpen: false }),
     }
-})
+});
