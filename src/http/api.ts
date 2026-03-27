@@ -1,4 +1,3 @@
-
 import { api } from "./client"
 import { DeliveryPerson, Inventory, InventoryData, Product, Warehouse } from "@/types";
 
